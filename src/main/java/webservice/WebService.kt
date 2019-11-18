@@ -67,6 +67,16 @@ open class WebService {
         else return db.getPerson(surname, name, lastname)
     }
 
+    @DeleteMapping("/person")
+    fun personDelete(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
+                  @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
+                  @RequestBody(required = true) body: String) {
+        db.incrementCount()
+        db.validateApiKey(apiKey)
+        val id : Long = JsonPath.parse(body).read("$['id']")
+        db.deletePerson(id)
+    }
+
     @PutMapping("/person")
     fun personPut(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
                   @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
@@ -82,7 +92,6 @@ open class WebService {
         db.updatePerson(id, surname, name, lastname, birthDate)
         return Person(id, surname, name, lastname, birthDate)
     }
-
 
     @PostMapping("/person")
     fun personPost(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,

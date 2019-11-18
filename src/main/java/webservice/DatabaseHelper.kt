@@ -27,6 +27,12 @@ class DatabaseHelper() {
         } else throw WebService.InvalidCredentialException()
     }
 
+
+    fun deletePerson(id: Long) {
+        val query: String = java.lang.String.format("DELETE FROM person WHERE id = %d", id)
+        conn.createStatement().execute(query)
+    }
+
     fun getPerson(id: Int): ArrayList<WebService.Person> {
         val query: String = java.lang.String.format("SELECT * FROM person WHERE id = %d", id)
         val rs = conn.createStatement().executeQuery(query)
@@ -78,11 +84,6 @@ class DatabaseHelper() {
         val rs = conn.createStatement().executeQuery(query)
         rs.next()
         if (rs.getInt("count") == 0) throw WebService.NoApiKeyProvidedException()
-    }
-
-
-    fun stop() {
-        conn.close()
     }
 
     fun getCount(): Long {
