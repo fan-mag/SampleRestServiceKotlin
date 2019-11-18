@@ -2,6 +2,7 @@ package webservice
 
 import java.sql.Connection
 import java.sql.DriverManager
+import java.text.SimpleDateFormat
 import java.util.*
 
 class DatabaseHelper() {
@@ -35,7 +36,26 @@ class DatabaseHelper() {
                     rs.getString("Имя"), rs.getString("Отчество"),
                     rs.getDate("Дата_рождения")))
             return array
-        } else throw WebService.NoContentError()
+        } else throw WebService.NoContentException()
+    }
+
+    fun createPerson(surname: String, name: String, lastname: String, birthDate: Date): Long {
+        val birth: String = SimpleDateFormat("yyyy-MM-dd").format(birthDate)
+        val query: String = java.lang.String.format("INSERT INTO person " +
+                "(id, Фамилия, Имя, Отчество, Дата_рождения) " +
+                "VALUES (DEFAULT, '%s', '%s', '%s', '%s') RETURNING id AS ID",
+                surname, name, lastname, birth)
+        val rs = conn.createStatement().executeQuery(query)
+        rs.next()
+        return rs.getLong("ID")
+    }
+
+    fun updatePerson(id: Long, surname: String, name: String, lastname: String, birthDate: Date) {
+        val birth: String = SimpleDateFormat("yyyy-MM-dd").format(birthDate)
+        val query: String = java.lang.String.format("UPDATE person " +
+                "SET Фамилия = '%s', Имя = '%s', Отчество = '%s', Дата_рождения = '%s' " +
+                "WHERE id = %d", surname, name, lastname, birth, id)
+        conn.createStatement().execute(query)
     }
 
     fun getPerson(surname: String, name: String, lastname: String): ArrayList<WebService.Person> {
@@ -48,7 +68,7 @@ class DatabaseHelper() {
                     rs.getString("Имя"), rs.getString("Отчество"),
                     rs.getDate("Дата_рождения")))
         }
-        if (array.size == 0) throw WebService.NoContentError()
+        if (array.size == 0) throw WebService.NoContentException()
         else return array
     }
 
@@ -64,6 +84,20 @@ class DatabaseHelper() {
     fun stop() {
         conn.close()
     }
+
+    fun getCount(): Long {
+        val query: String = "SELECT hitcount FROM rest_stat"
+        val rs = conn.createStatement().executeQuery(query)
+        rs.next()
+        return rs.getLong("hitcount")
+    }
+
+    fun incrementCount() {
+        val query = "UPDATE rest_stat SET hitcount = hitcount + 1"
+        conn.createStatement().execute(query)
+    }
+
+
 
 
 }
