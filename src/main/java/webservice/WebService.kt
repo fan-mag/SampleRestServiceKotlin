@@ -77,7 +77,7 @@ open class WebService {
     @PutMapping("/person")
     fun personPut(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
                   @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
-                  @RequestBody(required = true) body: String): Person {
+                  @RequestBody(required = true) body: String): ResponseEntity<Any> {
         db.incrementCount()
         db.validateApiKey(apiKey)
         validateHeaders(contentType)
@@ -87,13 +87,13 @@ open class WebService {
         val lastname: String = JsonPath.parse(body).read("$['lastname']")
         val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(JsonPath.parse(body).read("$['birthdate']"))
         db.updatePerson(id, surname, name, lastname, birthDate)
-        return Person(id, surname, name, lastname, birthDate)
+        return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.OK)
     }
 
     @PostMapping("/person")
     fun personPost(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
                    @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
-                   @RequestBody(required = true) body: String): Person {
+                   @RequestBody(required = true) body: String): ResponseEntity<Any> {
         db.incrementCount()
         db.validateApiKey(apiKey)
         validateHeaders(contentType)
@@ -102,7 +102,7 @@ open class WebService {
         val lastname: String = JsonPath.parse(body).read("$['lastname']")
         val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(JsonPath.parse(body).read("$['birthdate']"))
         val id: Long = db.createPerson(surname, name, lastname, birthDate)
-        return Person(id, surname, name, lastname, birthDate)
+        return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.CREATED)
     }
 
 
