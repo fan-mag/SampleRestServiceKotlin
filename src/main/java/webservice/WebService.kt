@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.lang.ClassCastException
 import java.lang.RuntimeException
@@ -26,32 +27,24 @@ open class WebService {
     class Greeting internal constructor(val id: Long, val content: String)
     class ApiKey internal constructor(val api_key: String)
     class Result internal constructor(val result: Long)
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Seems to be Class Cast Exception")
-    class CustomClassCastException : RuntimeException()
 
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Seems to be Invalid Json Exception")
-    class CustomParseException : RuntimeException()
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Unauthorized")
+    class Exception401 : RuntimeException()
 
-    @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Bad Credentials")
-    class InvalidCredentialException : RuntimeException()
+    @ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "No content")
+    class Success201 : RuntimeException()
 
-    @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Bad Api Key provided / Unauthorized")
-    class NoApiKeyProvidedException : RuntimeException()
-
-    @ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "No returned data for this query")
-    class NoContentException : RuntimeException()
-
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Invalid Content-Type Header")
-    class InvalidContentTypeException : RuntimeException()
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Bad request")
+    class Exception400 : RuntimeException()
 
     @PutMapping("/login")
     fun getApiKey(@RequestBody(required = true) body: String,
-                  @RequestHeader(value = "Content-Type") contentType: String): ApiKey {
+                  @RequestHeader(value = "Content-Type") contentType: String): ResponseEntity<Any> {
         db.incrementCount()
         validateHeaders(contentType)
         val login: String = JsonPath.parse(body).read("$['login']")
         val password: String = JsonPath.parse(body).read("$['password']")
-        return ApiKey(db.getApiKey(login, password))
+        return ResponseEntity(ApiKey(db.getApiKey(login, password)), HttpStatus.OK)
     }
 
     @GetMapping("/person")
@@ -62,18 +55,21 @@ open class WebService {
                   @RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String): ArrayList<Person> {
         db.incrementCount()
         db.validateApiKey(apiKey)
+        val persons: ArrayList<Person>
         if (id != 0)
-            return db.getPerson(id)
-        else return db.getPerson(surname, name, lastname)
+            persons = db.getPerson(id)
+        else persons = db.getPerson(surname, name, lastname)
+        if (persons.isEmpty()) throw Success201()
+        else return persons
     }
 
     @DeleteMapping("/person")
     fun personDelete(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
-                  @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
-                  @RequestBody(required = true) body: String) {
+                     @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
+                     @RequestBody(required = true) body: String) {
         db.incrementCount()
         db.validateApiKey(apiKey)
-        val id : Long = JsonPath.parse(body).read("$['id']")
+        val id: Long = JsonPath.parse(body).read("$['id']")
         db.deletePerson(id)
     }
 
@@ -84,7 +80,7 @@ open class WebService {
         db.incrementCount()
         db.validateApiKey(apiKey)
         validateHeaders(contentType)
-        val id : Long = JsonPath.parse(body).read("$['id']")
+        val id: Long = JsonPath.parse(body).read("$['id']")
         val surname: String = JsonPath.parse(body).read("$['surname']")
         val name: String = JsonPath.parse(body).read("$['name']")
         val lastname: String = JsonPath.parse(body).read("$['lastname']")
@@ -109,49 +105,8 @@ open class WebService {
     }
 
 
-    @RequestMapping("/greeting", method = arrayOf(RequestMethod.GET))
-    fun greeting(@RequestParam(value = "name", defaultValue = "World") name: String,
-                 @RequestParam(value = "lastname", defaultValue = "Worldovich") lastname: String): Greeting {
-        db.incrementCount()
-        return Greeting(counter.incrementAndGet(), java.lang.String.format("Hello, %s, %s", name, lastname))
-    }
-
-    @RequestMapping("/calcsumm", method = arrayOf(RequestMethod.GET))
-    fun calcsumm(@RequestParam(value = "first", defaultValue = "0") first: Long,
-                 @RequestParam(value = "second", defaultValue = "0") second: Long): Result {
-        db.incrementCount()
-        return Result(first + second)
-    }
-
-    @RequestMapping("/calcdiv", method = arrayOf(RequestMethod.GET))
-    fun calcdiv(@RequestParam(value = "first", defaultValue = "0") first: Long,
-                @RequestParam(value = "second", defaultValue = "1") second: Long): Result {
-        db.incrementCount()
-        return Result(first / second)
-    }
-
-    @RequestMapping("/calcsumm", method = arrayOf(RequestMethod.PUT))
-    fun calcsumm(@RequestBody(required = true) body: String): Result {
-        db.incrementCount()
-        try {
-            val first: Long = JsonPath.parse(body).read("$['first']")
-            val second: Long = JsonPath.parse(body).read("$['second']")
-            return Result(first + second)
-        } catch (e: ClassCastException) {
-            throw CustomClassCastException()
-        } catch (e: InvalidJsonException) {
-            throw CustomParseException()
-        }
-    }
-
-    @RequestMapping("/count")
-    fun count(): Result {
-        db.incrementCount()
-        return Result(db.getCount())
-    }
-
     private fun validateHeaders(contentType: String) {
-        if (contentType != "application/json") throw InvalidContentTypeException()
+        if (contentType != "application/json") throw Exception400()
     }
 
     companion object {

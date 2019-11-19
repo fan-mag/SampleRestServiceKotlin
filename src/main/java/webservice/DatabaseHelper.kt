@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class DatabaseHelper() {
-    lateinit var conn: Connection
+    var conn: Connection
 
     init {
         Class.forName("org.postgresql.Driver")
@@ -24,7 +24,7 @@ class DatabaseHelper() {
         val rs = statement.executeQuery(query)
         if (rs.next()) {
             return rs.getString("api_key")
-        } else throw WebService.InvalidCredentialException()
+        } else throw WebService.Exception401()
     }
 
 
@@ -42,7 +42,7 @@ class DatabaseHelper() {
                     rs.getString("Имя"), rs.getString("Отчество"),
                     rs.getDate("Дата_рождения")))
             return array
-        } else throw WebService.NoContentException()
+        } else throw WebService.Success201()
     }
 
     fun createPerson(surname: String, name: String, lastname: String, birthDate: Date): Long {
@@ -74,8 +74,7 @@ class DatabaseHelper() {
                     rs.getString("Имя"), rs.getString("Отчество"),
                     rs.getDate("Дата_рождения")))
         }
-        if (array.size == 0) throw WebService.NoContentException()
-        else return array
+        return array
     }
 
     fun validateApiKey(apiKey: String) {
@@ -83,7 +82,7 @@ class DatabaseHelper() {
                 , apiKey)
         val rs = conn.createStatement().executeQuery(query)
         rs.next()
-        if (rs.getInt("count") == 0) throw WebService.NoApiKeyProvidedException()
+        if (rs.getInt("count") == 0) throw WebService.Exception401()
     }
 
     fun getCount(): Long {
@@ -97,8 +96,6 @@ class DatabaseHelper() {
         val query = "UPDATE rest_stat SET hitcount = hitcount + 1"
         conn.createStatement().execute(query)
     }
-
-
 
 
 }
