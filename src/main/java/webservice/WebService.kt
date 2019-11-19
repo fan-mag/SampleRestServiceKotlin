@@ -52,15 +52,15 @@ open class WebService {
                   @RequestParam(value = "name", defaultValue = "") name: String,
                   @RequestParam(value = "lastname", defaultValue = "") lastname: String,
                   @RequestParam(value = "id", defaultValue = "0") id: Int,
-                  @RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String): ArrayList<Person> {
+                  @RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String): ResponseEntity<Any> {
         db.incrementCount()
         db.validateApiKey(apiKey)
         val persons: ArrayList<Person>
         if (id != 0)
             persons = db.getPerson(id)
         else persons = db.getPerson(surname, name, lastname)
-        if (persons.isEmpty()) throw Success201()
-        else return persons
+        val status: HttpStatus = if (persons.isEmpty()) HttpStatus.NO_CONTENT else HttpStatus.OK
+        return ResponseEntity(persons, status)
     }
 
     @DeleteMapping("/person")
