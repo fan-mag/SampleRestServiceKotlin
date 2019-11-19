@@ -28,9 +28,16 @@ class DatabaseHelper() {
     }
 
 
-    fun deletePerson(id: Long) {
-        val query: String = java.lang.String.format("DELETE FROM person WHERE id = %d", id)
-        conn.createStatement().execute(query)
+    fun deletePerson(id: Long) : Boolean {
+        val querySelect: String = java.lang.String.format("SELECT COUNT(*) FROM person WHERE id = %d", id)
+        val rs = conn.createStatement().executeQuery(querySelect)
+        rs.next();
+        val isRecordExist : Boolean = (rs.getInt("count") == 1)
+        if (isRecordExist) {
+            val queryDelete: String = java.lang.String.format("DELETE FROM person WHERE id = %d", id)
+            conn.createStatement().execute(queryDelete)
+        }
+        return isRecordExist
     }
 
     fun getPerson(id: Int): ArrayList<WebService.Person> {

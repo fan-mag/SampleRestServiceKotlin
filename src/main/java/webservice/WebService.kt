@@ -24,7 +24,6 @@ open class WebService {
 
     class Passport internal constructor(var id: Long, var person: Person, var serie: Int, var number: Int)
     class Person internal constructor(var id: Long, var surname: String, var name: String, var lastname: String, var birthDate: Date)
-    class Greeting internal constructor(val id: Long, val content: String)
     class ApiKey internal constructor(val api_key: String)
     class Result internal constructor(val result: Long)
 
@@ -66,11 +65,13 @@ open class WebService {
     @DeleteMapping("/person")
     fun personDelete(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
                      @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
-                     @RequestBody(required = true) body: String) {
+                     @RequestBody(required = true) body: String):  ResponseEntity<Any> {
         db.incrementCount()
         db.validateApiKey(apiKey)
         val id: Long = JsonPath.parse(body).read("$['id']")
-        db.deletePerson(id)
+        val personDeleted = db.deletePerson(id)
+        val status: HttpStatus = if (personDeleted) HttpStatus.NO_CONTENT else HttpStatus.UNPROCESSABLE_ENTITY
+        return ResponseEntity(personDeleted, status)
     }
 
     @PutMapping("/person")
