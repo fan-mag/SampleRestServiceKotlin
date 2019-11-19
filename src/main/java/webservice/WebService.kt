@@ -1,6 +1,5 @@
 package webservice
 
-import com.jayway.jsonpath.InvalidJsonException
 import com.jayway.jsonpath.JsonPath
 import org.springframework.boot.ExitCodeGenerator
 import java.util.concurrent.atomic.AtomicLong
@@ -11,7 +10,6 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.lang.ClassCastException
 import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -19,13 +17,10 @@ import java.util.*
 @SpringBootApplication
 @RestController
 open class WebService {
-    private val counter = AtomicLong()
     private val db = DatabaseHelper()
 
-    class Passport internal constructor(var id: Long, var person: Person, var serie: Int, var number: Int)
     class Person internal constructor(var id: Long, var surname: String, var name: String, var lastname: String, var birthDate: Date)
     class ApiKey internal constructor(val api_key: String)
-    class Result internal constructor(val result: Long)
 
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Unauthorized")
     class Exception401 : RuntimeException()
