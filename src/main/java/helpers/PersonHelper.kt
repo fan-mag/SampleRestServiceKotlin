@@ -18,7 +18,7 @@ class PersonHelper : DatabaseHelper() {
         return array
     }
 
-    fun createPerson(surname: String, name: String, lastname: String, birthDate: Date): Long {
+    fun createPerson(surname: String?, name: String?, lastname: String?, birthDate: Date): Long {
         val birth: String = SimpleDateFormat("yyyy-MM-dd").format(birthDate)
         val query: String = "INSERT INTO person " +
                 "(id, Фамилия, Имя, Отчество, Дата_рождения) " +
@@ -28,14 +28,14 @@ class PersonHelper : DatabaseHelper() {
         return rs.getLong("ID")
     }
 
-    fun updatePerson(id: Long, surname: String, name: String, lastname: String, birthDate: Date) {
+    fun updatePerson(id: Long?, surname: String?, name: String?, lastname: String?, birthDate: Date) {
         val birth: String = SimpleDateFormat("yyyy-MM-dd").format(birthDate)
         val query: String = "UPDATE person SET Фамилия = '$surname', Имя = '$name', Отчество = '$lastname', Дата_рождения = '$birth' " +
                 "WHERE id = $id"
         conn.createStatement().execute(query)
     }
 
-    fun deletePerson(id: Long): Boolean {
+    fun deletePerson(id: Long?): Boolean {
         val querySelect: String = "SELECT COUNT(*) FROM person WHERE id = $id" +
                 ""
         val rs = conn.createStatement().executeQuery(querySelect)

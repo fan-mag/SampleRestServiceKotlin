@@ -4,7 +4,7 @@ import model.ApiKey
 import webservice.BaseService
 
 class CredentialsHelper : DatabaseHelper() {
-    fun getApiKey(login: String, password: String): String {
+    fun getApiKey(login: String?, password: String?): String {
         val query = "SELECT * FROM credentials WHERE login = '$login' AND password = '$password'"
         val statement = conn.createStatement()
         val rs = statement.executeQuery(query)
@@ -21,7 +21,7 @@ class CredentialsHelper : DatabaseHelper() {
         } else throw BaseService.Exception401()
     }
 
-    fun generateApiKey(login: String, password: String): String {
+    fun generateApiKey(login: String?, password: String?): String {
         val query = "SELECT COUNT(*) FROM credentials WHERE login = '$login' AND password = '$password'"
         val rs = conn.createStatement().executeQuery(query)
         rs.next()

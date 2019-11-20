@@ -25,9 +25,9 @@ class WebServicePassport : BaseService() {
                        @RequestBody(required = true) body: String): ResponseEntity<Any> {
         incrementCount()
         validateApiKey(apiKey, 15)
-        val id: Int? = JsonPath.parse(body).read("$['id']")
-        val seria: Int? = JsonPath.parse(body).read("$['seria']")
-        val number: Int? = JsonPath.parse(body).read("$['number']")
+        val id: Int? = jsonParse(body, "$['id']") as Int?
+        val seria: Int? = jsonParse(body, "$['seria']") as Int?
+        val number: Int? = jsonParse(body, "$['number']") as Int?
         val isPassportDeleted = dbPassport.deletePassport(id, seria, number)
         val status: HttpStatus = if (isPassportDeleted) HttpStatus.NO_CONTENT else HttpStatus.UNPROCESSABLE_ENTITY
         return ResponseEntity(isPassportDeleted, status)

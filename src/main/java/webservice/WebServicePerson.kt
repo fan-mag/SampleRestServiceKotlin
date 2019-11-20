@@ -30,7 +30,7 @@ class WebServicePerson : BaseService() {
                      @RequestBody(required = true) body: String): ResponseEntity<Any> {
         incrementCount()
         validateApiKey(apiKey, 15)
-        val id: Long = JsonPath.parse(body).read("$['id']")
+        val id: Long? = jsonParse(body, "$['id']") as Long?
         val personDeleted = dbPerson.deletePerson(id)
         val status: HttpStatus = if (personDeleted) HttpStatus.NO_CONTENT else HttpStatus.UNPROCESSABLE_ENTITY
         return ResponseEntity(personDeleted, status)
@@ -43,11 +43,11 @@ class WebServicePerson : BaseService() {
         incrementCount()
         validateApiKey(apiKey, 15)
         validateHeaders(contentType)
-        val id: Long = JsonPath.parse(body).read("$['id']")
-        val surname: String = JsonPath.parse(body).read("$['surname']")
-        val name: String = JsonPath.parse(body).read("$['name']")
-        val lastname: String = JsonPath.parse(body).read("$['lastname']")
-        val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(JsonPath.parse(body).read("$['birthdate']"))
+        val id: Long? = jsonParse(body, "$['id']") as Long?
+        val surname: String? = jsonParse(body, "$['surname']") as String?
+        val name: String? = jsonParse(body, "$['name']") as String?
+        val lastname: String? = jsonParse(body, "$['lastname']") as String?
+        val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(jsonParse(body, "$['birthdate']") as String?)
         dbPerson.updatePerson(id, surname, name, lastname, birthDate)
         return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.OK)
     }
@@ -59,10 +59,10 @@ class WebServicePerson : BaseService() {
         incrementCount()
         validateApiKey(apiKey, 15)
         validateHeaders(contentType)
-        val surname: String = JsonPath.parse(body).read("$['surname']")
-        val name: String = JsonPath.parse(body).read("$['name']")
-        val lastname: String = JsonPath.parse(body).read("$['lastname']")
-        val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(JsonPath.parse(body).read("$['birthdate']"))
+        val surname: String? = jsonParse(body, "$['surname']") as String?
+        val name: String? = jsonParse(body, "$['name']") as String?
+        val lastname: String? = jsonParse(body, "$['lastname']") as String?
+        val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(jsonParse(body, "$['birthdate']") as String?)
         val id: Long = dbPerson.createPerson(surname, name, lastname, birthDate)
         return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.CREATED)
     }

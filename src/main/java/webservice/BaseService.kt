@@ -1,5 +1,7 @@
 package webservice
 
+import com.jayway.jsonpath.JsonPath
+import com.jayway.jsonpath.PathNotFoundException
 import helpers.*
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -15,12 +17,20 @@ open class BaseService {
         if (contentType != "application/json") throw Exception400()
     }
 
-    protected fun validateApiKey(apiKey: String, privilegeLevel : Int) {
+    protected fun validateApiKey(apiKey: String, privilegeLevel: Int) {
         dbCredentials.validateApiKey(apiKey, privilegeLevel)
     }
 
     protected fun incrementCount() {
         dbStatistic.incrementCount()
+    }
+
+    protected fun jsonParse(body: String, key: String): Any? {
+        try {
+            return JsonPath.parse(body).read(key)
+        } catch (exception : PathNotFoundException) {
+            return null
+        }
     }
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Bad request")
