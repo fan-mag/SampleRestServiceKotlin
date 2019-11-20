@@ -23,22 +23,8 @@ class PassportHelper : DatabaseHelper() {
     }
 
     fun deletePassport(id: Int?, seria: Int?, number: Int?): Boolean {
-        val query = StringBuilder("DELETE FROM passport WHERE ")
-        if (id == null) {
-            if (seria != null) {
-                query.append("Серия = $seria")
-                if (number != null) {
-                    query.append(" AND Номер = $number")
-                }
-            } else {
-                if (number != null) {
-                    query.append(" Номер = $number")
-                }
-            }
-        } else {
-            query.append("id = $id")
-        }
-
+        val query = deleteQueryBuilder(id, seria, number)
+        conn.createStatement().execute(query)
         return true
     }
 
@@ -56,6 +42,11 @@ class PassportHelper : DatabaseHelper() {
     }
 
     fun deleteQueryBuilder(id: Int?, seria: Int?, number: Int?): String {
+        if (id != null)
+            return "DELETE FROM passport WHERE id = $id"
+        if (seria != null) {
+            if (number != null) return "DELETE FROM passport WHERE Серия = '$seria' AND Номер = '$number'"
+        }
         return ""
     }
 }
