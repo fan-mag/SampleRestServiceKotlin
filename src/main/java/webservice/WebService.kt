@@ -21,6 +21,7 @@ open class WebService {
 
     class Person internal constructor(var id: Long, var surname: String, var name: String, var lastname: String, var birthDate: Date)
     class ApiKey internal constructor(val api_key: String)
+    class Count internal constructor(val count: Long)
 
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Unauthorized")
     class Exception401 : RuntimeException()
@@ -100,6 +101,11 @@ open class WebService {
         return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.CREATED)
     }
 
+    @GetMapping("/count")
+    fun countGet(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String) : ResponseEntity<Any>{
+        db.incrementCount()
+        return ResponseEntity(Count(db.getCount()), HttpStatus.OK)
+    }
 
     private fun validateHeaders(contentType: String) {
         if (contentType != "application/json") throw Exception400()
