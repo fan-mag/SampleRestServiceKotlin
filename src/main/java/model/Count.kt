@@ -1,4 +1,3 @@
 package model
 
-class Count(val Count: Long) {
-}
+class Count(val Count: Long)

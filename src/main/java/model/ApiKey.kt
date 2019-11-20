@@ -1,5 +1,3 @@
 package model
 
-class ApiKey(val Api_Key: String) {
-
-}
+class ApiKey(val Api_Key: String)
