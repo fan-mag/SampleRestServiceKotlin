@@ -5,8 +5,8 @@ import java.sql.DriverManager
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DatabaseHelper() {
-    var conn: Connection
+class DatabaseHelper {
+    private var conn: Connection
 
     init {
         Class.forName("org.postgresql.Driver")
@@ -24,14 +24,14 @@ class DatabaseHelper() {
         val rs = statement.executeQuery(query)
         if (rs.next()) {
             return rs.getString("api_key")
-        } else throw WebService.Exception401()
+        } else throw BaseService.Exception401()
     }
 
 
     fun deletePerson(id: Long) : Boolean {
         val querySelect: String = java.lang.String.format("SELECT COUNT(*) FROM person WHERE id = %d", id)
         val rs = conn.createStatement().executeQuery(querySelect)
-        rs.next();
+        rs.next()
         val isRecordExist : Boolean = (rs.getInt("count") == 1)
         if (isRecordExist) {
             val queryDelete: String = java.lang.String.format("DELETE FROM person WHERE id = %d", id)
@@ -49,7 +49,7 @@ class DatabaseHelper() {
                     rs.getString("Имя"), rs.getString("Отчество"),
                     rs.getDate("Дата_рождения")))
             return array
-        } else throw WebService.Success201()
+        } else throw BaseService.Success201()
     }
 
     fun createPerson(surname: String, name: String, lastname: String, birthDate: Date): Long {
@@ -89,11 +89,11 @@ class DatabaseHelper() {
                 , apiKey)
         val rs = conn.createStatement().executeQuery(query)
         rs.next()
-        if (rs.getInt("count") == 0) throw WebService.Exception401()
+        if (rs.getInt("count") == 0) throw BaseService.Exception401()
     }
 
     fun getCount(): Long {
-        val query: String = "SELECT hitcount FROM rest_stat"
+        val query = "SELECT hitcount FROM rest_stat"
         val rs = conn.createStatement().executeQuery(query)
         rs.next()
         return rs.getLong("hitcount")

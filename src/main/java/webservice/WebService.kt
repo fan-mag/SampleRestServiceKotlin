@@ -1,8 +1,7 @@
 package webservice
 
 import com.jayway.jsonpath.JsonPath
-import org.springframework.boot.ExitCodeGenerator
-import java.util.concurrent.atomic.AtomicLong
+
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -10,37 +9,16 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 
 @SpringBootApplication
 @RestController
-open class WebService {
-    private val db = DatabaseHelper()
+open class WebService : BaseService() {
 
     class Person internal constructor(var id: Long, var surname: String, var name: String, var lastname: String, var birthDate: Date)
     class ApiKey internal constructor(val api_key: String)
     class Count internal constructor(val count: Long)
-
-    @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Unauthorized")
-    class Exception401 : RuntimeException()
-
-    @ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "No content")
-    class Success201 : RuntimeException()
-
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Bad request")
-    class Exception400 : RuntimeException()
-
-    @PutMapping("/login")
-    fun getApiKey(@RequestBody(required = true) body: String,
-                  @RequestHeader(value = "Content-Type") contentType: String): ResponseEntity<Any> {
-        db.incrementCount()
-        validateHeaders(contentType)
-        val login: String = JsonPath.parse(body).read("$['login']")
-        val password: String = JsonPath.parse(body).read("$['password']")
-        return ResponseEntity(ApiKey(db.getApiKey(login, password)), HttpStatus.OK)
-    }
 
     @GetMapping("/person")
     fun personGet(@RequestParam(value = "surname", defaultValue = "") surname: String,
@@ -108,21 +86,8 @@ open class WebService {
         return ResponseEntity(Count(db.getCount()), HttpStatus.OK)
     }
 
-    private fun validateHeaders(contentType: String) {
-        if (contentType != "application/json") throw Exception400()
-    }
-
     companion object {
         private lateinit var application: ConfigurableApplicationContext
-
-        @JvmStatic
-        fun start() {
-        }
-
-        @JvmStatic
-        fun stop() {
-            SpringApplication.exit(application, ExitCodeGenerator { -> 0 })
-        }
 
         @JvmStatic
         fun main(args: Array<String>) {
