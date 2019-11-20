@@ -16,12 +16,10 @@ class WebServicePerson : BaseService() {
                   @RequestParam(value = "lastname", defaultValue = "") lastname: String,
                   @RequestParam(value = "id", defaultValue = "0") id: Int,
                   @RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String): ResponseEntity<Any> {
-        db.incrementCount()
-        db.validateApiKey(apiKey)
-        val persons: ArrayList<Person>
-        if (id != 0)
-            persons = db.getPerson(id)
-        else persons = db.getPerson(surname, name, lastname)
+        incrementCount()
+        validateApiKey(apiKey)
+        val persons: ArrayList<Person> = if (id != 0) dbPerson.getPerson(id)
+        else dbPerson.getPerson(surname, name, lastname)
         val status: HttpStatus = if (persons.isEmpty()) HttpStatus.NO_CONTENT else HttpStatus.OK
         return ResponseEntity(persons, status)
     }
@@ -30,10 +28,10 @@ class WebServicePerson : BaseService() {
     fun personDelete(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
                      @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
                      @RequestBody(required = true) body: String): ResponseEntity<Any> {
-        db.incrementCount()
-        db.validateApiKey(apiKey)
+        incrementCount()
+        validateApiKey(apiKey)
         val id: Long = JsonPath.parse(body).read("$['id']")
-        val personDeleted = db.deletePerson(id)
+        val personDeleted = dbPerson.deletePerson(id)
         val status: HttpStatus = if (personDeleted) HttpStatus.NO_CONTENT else HttpStatus.UNPROCESSABLE_ENTITY
         return ResponseEntity(personDeleted, status)
     }
@@ -42,15 +40,15 @@ class WebServicePerson : BaseService() {
     fun personPut(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
                   @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
                   @RequestBody(required = true) body: String): ResponseEntity<Any> {
-        db.incrementCount()
-        db.validateApiKey(apiKey)
+        incrementCount()
+        validateApiKey(apiKey)
         validateHeaders(contentType)
         val id: Long = JsonPath.parse(body).read("$['id']")
         val surname: String = JsonPath.parse(body).read("$['surname']")
         val name: String = JsonPath.parse(body).read("$['name']")
         val lastname: String = JsonPath.parse(body).read("$['lastname']")
         val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(JsonPath.parse(body).read("$['birthdate']"))
-        db.updatePerson(id, surname, name, lastname, birthDate)
+        dbPerson.updatePerson(id, surname, name, lastname, birthDate)
         return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.OK)
     }
 
@@ -58,14 +56,15 @@ class WebServicePerson : BaseService() {
     fun personPost(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
                    @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
                    @RequestBody(required = true) body: String): ResponseEntity<Any> {
-        db.incrementCount()
-        db.validateApiKey(apiKey)
+        incrementCount()
+        validateApiKey(apiKey)
         validateHeaders(contentType)
+
         val surname: String = JsonPath.parse(body).read("$['surname']")
         val name: String = JsonPath.parse(body).read("$['name']")
         val lastname: String = JsonPath.parse(body).read("$['lastname']")
         val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(JsonPath.parse(body).read("$['birthdate']"))
-        val id: Long = db.createPerson(surname, name, lastname, birthDate)
+        val id: Long = dbPerson.createPerson(surname, name, lastname, birthDate)
         return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.CREATED)
     }
 }

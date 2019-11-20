@@ -15,10 +15,10 @@ open class WebServiceLogin : BaseService() {
     @PutMapping("/login")
     fun getApiKey(@RequestBody(required = true) body: String,
                   @RequestHeader(value = "Content-Type") contentType: String): ResponseEntity<Any> {
-        db.incrementCount()
+        incrementCount()
         validateHeaders(contentType)
         val login: String = JsonPath.parse(body).read("$['login']")
         val password: String = JsonPath.parse(body).read("$['password']")
-        return ResponseEntity(ApiKey(db.getApiKey(login, password)), HttpStatus.OK)
+        return ResponseEntity(ApiKey(dbCredentials.getApiKey(login, password)), HttpStatus.OK)
     }
 }

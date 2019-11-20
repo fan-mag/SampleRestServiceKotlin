@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController
 class WebServiceCount : BaseService() {
     @GetMapping("/count")
     fun countGet(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String) : ResponseEntity<Any> {
-        db.incrementCount()
-        db.validateApiKey(apiKey)
-        return ResponseEntity(Count(db.getCount()), HttpStatus.OK)
+        incrementCount()
+        validateApiKey(apiKey)
+        return ResponseEntity(Count(dbStatistic.getCount()), HttpStatus.OK)
     }
 }
