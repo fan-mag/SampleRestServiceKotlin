@@ -1,25 +1,15 @@
 package webservice
 
 import com.jayway.jsonpath.JsonPath
-
-
-import org.springframework.boot.SpringApplication
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.context.ConfigurableApplicationContext
+import model.Person
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-@SpringBootApplication
 @RestController
-open class WebService : BaseService() {
-
-    class Person internal constructor(var id: Long, var surname: String, var name: String, var lastname: String, var birthDate: Date)
-    class ApiKey internal constructor(val api_key: String)
-    class Count internal constructor(val count: Long)
-
+class WebServicePerson : BaseService() {
     @GetMapping("/person")
     fun personGet(@RequestParam(value = "surname", defaultValue = "") surname: String,
                   @RequestParam(value = "name", defaultValue = "") name: String,
@@ -39,7 +29,7 @@ open class WebService : BaseService() {
     @DeleteMapping("/person")
     fun personDelete(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
                      @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
-                     @RequestBody(required = true) body: String):  ResponseEntity<Any> {
+                     @RequestBody(required = true) body: String): ResponseEntity<Any> {
         db.incrementCount()
         db.validateApiKey(apiKey)
         val id: Long = JsonPath.parse(body).read("$['id']")
@@ -78,22 +68,4 @@ open class WebService : BaseService() {
         val id: Long = db.createPerson(surname, name, lastname, birthDate)
         return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.CREATED)
     }
-
-    @GetMapping("/count")
-    fun countGet(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String) : ResponseEntity<Any>{
-        db.incrementCount()
-        db.validateApiKey(apiKey)
-        return ResponseEntity(Count(db.getCount()), HttpStatus.OK)
-    }
-
-    companion object {
-        private lateinit var application: ConfigurableApplicationContext
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            application = SpringApplication.run(WebService::class.java)
-        }
-    }
-
-
 }

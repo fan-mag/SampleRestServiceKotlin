@@ -1,5 +1,7 @@
-package webservice
+package helpers
 
+import model.Person
+import webservice.BaseService
 import java.sql.Connection
 import java.sql.DriverManager
 import java.text.SimpleDateFormat
@@ -40,12 +42,12 @@ class DatabaseHelper {
         return isRecordExist
     }
 
-    fun getPerson(id: Int): ArrayList<WebService.Person> {
+    fun getPerson(id: Int): ArrayList<Person> {
         val query: String = java.lang.String.format("SELECT * FROM person WHERE id = %d", id)
         val rs = conn.createStatement().executeQuery(query)
-        val array = ArrayList<WebService.Person>()
+        val array = ArrayList<Person>()
         if (rs.next()) {
-            array.add(WebService.Person(rs.getLong("id"), rs.getString("Фамилия"),
+            array.add(Person(rs.getLong("id"), rs.getString("Фамилия"),
                     rs.getString("Имя"), rs.getString("Отчество"),
                     rs.getDate("Дата_рождения")))
             return array
@@ -71,13 +73,13 @@ class DatabaseHelper {
         conn.createStatement().execute(query)
     }
 
-    fun getPerson(surname: String, name: String, lastname: String): ArrayList<WebService.Person> {
+    fun getPerson(surname: String, name: String, lastname: String): ArrayList<Person> {
         val query: String = java.lang.String.format("SELECT * FROM person WHERE Фамилия LIKE '%%%s' AND Имя LIKE '%%%s' AND Отчество LIKE '%%%s'"
                 , surname, name, lastname)
         val rs = conn.createStatement().executeQuery(query)
-        val array = ArrayList<WebService.Person>()
+        val array = ArrayList<Person>()
         while (rs.next()) {
-            array.add(WebService.Person(rs.getLong("id"), rs.getString("Фамилия"),
+            array.add(Person(rs.getLong("id"), rs.getString("Фамилия"),
                     rs.getString("Имя"), rs.getString("Отчество"),
                     rs.getDate("Дата_рождения")))
         }

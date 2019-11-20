@@ -1,6 +1,7 @@
 package webservice
 
 import com.jayway.jsonpath.JsonPath
+import model.ApiKey
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PutMapping
@@ -18,6 +19,6 @@ open class WebServiceLogin : BaseService() {
         validateHeaders(contentType)
         val login: String = JsonPath.parse(body).read("$['login']")
         val password: String = JsonPath.parse(body).read("$['password']")
-        return ResponseEntity(WebService.ApiKey(db.getApiKey(login, password)), HttpStatus.OK)
+        return ResponseEntity(ApiKey(db.getApiKey(login, password)), HttpStatus.OK)
     }
 }
