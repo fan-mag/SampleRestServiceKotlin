@@ -13,11 +13,13 @@ class CredentialsHelper : DatabaseHelper() {
         } else throw BaseService.Exception401()
     }
 
-    fun validateApiKey(apiKey: String) {
-        val query: String = java.lang.String.format("SELECT COUNT(*) FROM credentials WHERE api_key = '%s'"
+    fun validateApiKey(apiKey: String, privilegeLevel : Int) {
+        val query: String = java.lang.String.format("SELECT privilege FROM credentials WHERE api_key = '%s'"
                 , apiKey)
         val rs = conn.createStatement().executeQuery(query)
-        rs.next()
-        if (rs.getInt("count") == 0) throw BaseService.Exception401()
+        if (rs.next())
+        {
+            if (rs.getInt("privilege") < privilegeLevel) throw BaseService.Exception403()
+        } else throw BaseService.Exception401()
     }
 }

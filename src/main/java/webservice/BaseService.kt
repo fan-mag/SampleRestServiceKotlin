@@ -18,8 +18,8 @@ open class BaseService {
         if (contentType != "application/json") throw Exception400()
     }
 
-    protected fun validateApiKey(apiKey: String) {
-        dbCredentials.validateApiKey(apiKey)
+    protected fun validateApiKey(apiKey: String, privilegeLevel : Int) {
+        dbCredentials.validateApiKey(apiKey, privilegeLevel)
     }
 
     protected fun incrementCount() {
@@ -34,4 +34,7 @@ open class BaseService {
 
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Unauthorized")
     class Exception401 : RuntimeException()
+
+    @ResponseStatus(code = HttpStatus.FORBIDDEN, reason = "Forbidden")
+    class Exception403 : RuntimeException()
 }

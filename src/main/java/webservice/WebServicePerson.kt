@@ -17,7 +17,7 @@ class WebServicePerson : BaseService() {
                   @RequestParam(value = "id", defaultValue = "0") id: Int,
                   @RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String): ResponseEntity<Any> {
         incrementCount()
-        validateApiKey(apiKey)
+        validateApiKey(apiKey, 5)
         val persons: ArrayList<Person> = if (id != 0) dbPerson.getPerson(id)
         else dbPerson.getPerson(surname, name, lastname)
         val status: HttpStatus = if (persons.isEmpty()) HttpStatus.NO_CONTENT else HttpStatus.OK
@@ -29,7 +29,7 @@ class WebServicePerson : BaseService() {
                      @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
                      @RequestBody(required = true) body: String): ResponseEntity<Any> {
         incrementCount()
-        validateApiKey(apiKey)
+        validateApiKey(apiKey, 15)
         val id: Long = JsonPath.parse(body).read("$['id']")
         val personDeleted = dbPerson.deletePerson(id)
         val status: HttpStatus = if (personDeleted) HttpStatus.NO_CONTENT else HttpStatus.UNPROCESSABLE_ENTITY
@@ -41,7 +41,7 @@ class WebServicePerson : BaseService() {
                   @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
                   @RequestBody(required = true) body: String): ResponseEntity<Any> {
         incrementCount()
-        validateApiKey(apiKey)
+        validateApiKey(apiKey, 15)
         validateHeaders(contentType)
         val id: Long = JsonPath.parse(body).read("$['id']")
         val surname: String = JsonPath.parse(body).read("$['surname']")
@@ -57,9 +57,8 @@ class WebServicePerson : BaseService() {
                    @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
                    @RequestBody(required = true) body: String): ResponseEntity<Any> {
         incrementCount()
-        validateApiKey(apiKey)
+        validateApiKey(apiKey, 15)
         validateHeaders(contentType)
-
         val surname: String = JsonPath.parse(body).read("$['surname']")
         val name: String = JsonPath.parse(body).read("$['name']")
         val lastname: String = JsonPath.parse(body).read("$['lastname']")
