@@ -15,5 +15,8 @@ class Exception400 : RuntimeException() {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Incorrect format (not a json)")
     class IncorrectJson : RuntimeException()
 
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Incorrect Content-Type Header")
+    class NoContentType : RuntimeException()
+
 
 }

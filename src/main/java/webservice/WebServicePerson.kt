@@ -31,7 +31,7 @@ class WebServicePerson : BaseService() {
         incrementCount()
         validateApiKey(apiKey, 15)
         validateHeaders(contentType)
-        val id: Long = validateLongCast(validJsonParse(body, "$['id']"))
+        val id: Long = validJsonParseLong(body, "$['id']")
         if (validatePersonInDatabase(id))
             dbPerson.deletePerson(id)
         return ResponseEntity(Success202("Deleted Successfully"), HttpStatus.ACCEPTED)
@@ -62,9 +62,9 @@ class WebServicePerson : BaseService() {
         incrementCount()
         validateApiKey(apiKey, 15)
         validateHeaders(contentType)
-        val surname: String = validJsonParse(body, "$['surname']") as String
-        val name: String = validJsonParse(body, "$['name']") as String
-        val lastname: String = validJsonParse(body, "$['lastname']") as String
+        val surname: String = validJsonParseString(body, "$['surname']") as String
+        val name: String = validJsonParseString(body, "$['name']") as String
+        val lastname: String = validJsonParseString(body, "$['lastname']") as String
         val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(validJsonParse(body, "$['birthdate']") as String)
         val id: Long = dbPerson.createPerson(surname, name, lastname, birthDate)
         return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.CREATED)

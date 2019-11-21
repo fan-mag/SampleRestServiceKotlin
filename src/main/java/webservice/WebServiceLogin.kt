@@ -13,18 +13,18 @@ open class WebServiceLogin : BaseService() {
                   @RequestHeader(value = "Content-Type") contentType: String): ResponseEntity<Any> {
         incrementCount()
         validateHeaders(contentType)
-        val login: String = validJsonParse(body, "$['login']") as String
-        val password: String = validJsonParse(body, "$['password']") as String
+        val login: String = validJsonParseString(body, "$['login']")
+        val password: String = validJsonParseString(body, "$['password']")
         return ResponseEntity(ApiKey(dbCredentials.getApiKey(login, password)), HttpStatus.OK)
     }
 
     @PostMapping("/login")
     fun postApiKey(@RequestBody(required = true) body: String,
-                   @RequestHeader(value = "Content-Type") contentType: String): ResponseEntity<Any> {
+                   @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String): ResponseEntity<Any> {
         incrementCount()
         validateHeaders(contentType)
-        val login: String = validJsonParse(body, "$['login']") as String
-        val password: String = validJsonParse(body, "$['password']") as String
+        val login: String = validJsonParseString(body, "$['login']") as String
+        val password: String = validJsonParseString(body, "$['password']") as String
         return ResponseEntity(ApiKey(dbCredentials.generateApiKey(login, password)), HttpStatus.ACCEPTED)
     }
 }

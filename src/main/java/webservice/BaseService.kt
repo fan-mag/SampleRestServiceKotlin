@@ -21,13 +21,13 @@ open class BaseService {
     protected val dbPassport = PassportHelper()
 
     protected fun validateHeaders(contentType: String) {
-        if (contentType != "application/json") throw Exception400()
+
+        if (contentType != "application/json") throw Exception400.NoContentType()
     }
 
     protected fun validJsonParse(body: String, key: String): Any {
         try {
             return JsonPath.parse(body).read(key)
-
         } catch (exception: Exception) {
             when (exception) {
                 is PathNotFoundException -> throw Exception400.NoData()
@@ -49,8 +49,18 @@ open class BaseService {
         }
     }
 
-    protected fun validateLongCast(any: Any): Long {
+    protected fun validJsonParseString(body: String, key: String): String {
         try {
+            return validJsonParse(body, key).toString()
+        } catch (exception: ClassCastException) {
+            throw Exception400.ClassCast()
+        }
+    }
+
+
+    protected fun validJsonParseLong(body: String, key: String): Long {
+        try {
+            val any: Any = validJsonParse(body, key)
             if (any is Int)
                 return any.toLong()
             return any as Long
