@@ -2,10 +2,12 @@ package webservice
 
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.PathNotFoundException
-import helpers.*
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
-import java.lang.RuntimeException
+import errors.Exception400
+import helpers.CredentialsHelper
+import helpers.PassportHelper
+import helpers.PersonHelper
+import helpers.StatisticHelper
+
 
 open class BaseService {
     protected val dbPerson = PersonHelper()
@@ -33,15 +35,4 @@ open class BaseService {
         }
     }
 
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Bad request")
-    class Exception400 : RuntimeException()
-
-    @ResponseStatus(code = HttpStatus.NO_CONTENT, reason = "No content")
-    class Success201 : RuntimeException()
-
-    @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Unauthorized")
-    class Exception401 : RuntimeException()
-
-    @ResponseStatus(code = HttpStatus.FORBIDDEN, reason = "Forbidden")
-    class Exception403 : RuntimeException()
 }
