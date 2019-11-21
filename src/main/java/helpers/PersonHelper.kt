@@ -1,12 +1,11 @@
 package helpers
 
 import model.Person
-import webservice.BaseService
 import java.text.SimpleDateFormat
 import java.util.*
 
 class PersonHelper : DatabaseHelper() {
-    fun getPerson(id: Int): ArrayList<Person> {
+    fun getPerson(id: Long): ArrayList<Person> {
         val query = "SELECT * FROM person WHERE id = $id"
         val rs = conn.createStatement().executeQuery(query)
         val array = ArrayList<Person>()
@@ -30,24 +29,17 @@ class PersonHelper : DatabaseHelper() {
 
     fun updatePerson(id: Long?, surname: String?, name: String?, lastname: String?, birthDate: Date) {
         val birth: String = SimpleDateFormat("yyyy-MM-dd").format(birthDate)
-        val query: String = "UPDATE person SET Фамилия = '$surname', Имя = '$name', Отчество = '$lastname', Дата_рождения = '$birth' " +
+        val query: String = "UPDATE person " +
+                "SET Фамилия = '$surname', Имя = '$name', Отчество = '$lastname', Дата_рождения = '$birth' " +
                 "WHERE id = $id"
         conn.createStatement().execute(query)
     }
 
-    fun deletePerson(id: Long?): Boolean {
-        val querySelect: String = "SELECT COUNT(*) FROM person WHERE id = $id" +
-                ""
-        val rs = conn.createStatement().executeQuery(querySelect)
-        rs.next()
-        val isRecordExist: Boolean = (rs.getInt("count") == 1)
-        if (isRecordExist) {
-            val queryDelete: String = "DELETE FROM person WHERE id = $id" +
-                    ""
-            conn.createStatement().execute(queryDelete)
-        }
-        return isRecordExist
+    fun deletePerson(id: Long?) {
+        val queryDelete = "DELETE FROM person WHERE id = $id"
+        conn.createStatement().execute(queryDelete)
     }
+
 
     fun getPerson(surname: String, name: String, lastname: String): ArrayList<Person> {
         val query: String = "SELECT * FROM person WHERE Фамилия LIKE '%$surname' AND Имя LIKE '%$name' AND Отчество LIKE '%$lastname'" +

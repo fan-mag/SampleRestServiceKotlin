@@ -1,6 +1,6 @@
 package helpers
 
-import errors.Exception401
+import responses.Exception401
 
 
 class CredentialsHelper : DatabaseHelper() {

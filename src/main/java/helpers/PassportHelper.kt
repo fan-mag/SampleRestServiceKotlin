@@ -2,7 +2,6 @@ package helpers
 
 import model.Passport
 import model.Person
-import webservice.BaseService
 
 class PassportHelper : DatabaseHelper() {
     fun getPassport(userId: Int, seria: Int, number: Int): List<Passport> {
@@ -14,7 +13,7 @@ class PassportHelper : DatabaseHelper() {
             if (rs.wasNull()) personId = null
             val person: Person?
             if (personId != null)
-                person = PersonHelper().getPerson(rs.getInt("user_id"))[0]
+                person = PersonHelper().getPerson(rs.getLong("user_id"))[0]
             else person = null
             val passport = Passport(rs.getInt("id"), person, rs.getInt("Серия"), rs.getInt("Номер"))
             passports.add(passport)

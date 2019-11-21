@@ -4,6 +4,7 @@ import model.Person
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import responses.Success202
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -13,11 +14,11 @@ class WebServicePerson : BaseService() {
     fun personGet(@RequestParam(value = "surname", defaultValue = "") surname: String,
                   @RequestParam(value = "name", defaultValue = "") name: String,
                   @RequestParam(value = "lastname", defaultValue = "") lastname: String,
-                  @RequestParam(value = "id", defaultValue = "0") id: Int,
+                  @RequestParam(value = "id", defaultValue = "0") id: Long,
                   @RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String): ResponseEntity<Any> {
         incrementCount()
         validateApiKey(apiKey, 5)
-        val persons: ArrayList<Person> = if (id != 0) dbPerson.getPerson(id)
+        val persons: ArrayList<Person> = if (id != 0L) dbPerson.getPerson(id)
         else dbPerson.getPerson(surname, name, lastname)
         val status: HttpStatus = if (persons.isEmpty()) HttpStatus.NO_CONTENT else HttpStatus.OK
         return ResponseEntity(persons, status)
@@ -29,11 +30,14 @@ class WebServicePerson : BaseService() {
                      @RequestBody(required = true) body: String): ResponseEntity<Any> {
         incrementCount()
         validateApiKey(apiKey, 15)
-        val id: Long? = jsonParse(body, "$['id']") as Long?
-        val personDeleted = dbPerson.deletePerson(id)
-        val status: HttpStatus = if (personDeleted) HttpStatus.NO_CONTENT else HttpStatus.UNPROCESSABLE_ENTITY
-        return ResponseEntity(personDeleted, status)
+        validateHeaders(contentType)
+        val id: Long = validateLongCast(validJsonParse(body, "$['id']"))
+        if (validatePersonInDatabase(id))
+            dbPerson.deletePerson(id)
+        return ResponseEntity(Success202("Deleted Successfully"), HttpStatus.ACCEPTED)
     }
+
+
 
     @PutMapping("/person")
     fun personPut(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
@@ -58,10 +62,10 @@ class WebServicePerson : BaseService() {
         incrementCount()
         validateApiKey(apiKey, 15)
         validateHeaders(contentType)
-        val surname: String? = jsonParse(body, "$['surname']") as String?
-        val name: String? = jsonParse(body, "$['name']") as String?
-        val lastname: String? = jsonParse(body, "$['lastname']") as String?
-        val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(jsonParse(body, "$['birthdate']") as String?)
+        val surname: String = validJsonParse(body, "$['surname']") as String
+        val name: String = validJsonParse(body, "$['name']") as String
+        val lastname: String = validJsonParse(body, "$['lastname']") as String
+        val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(validJsonParse(body, "$['birthdate']") as String)
         val id: Long = dbPerson.createPerson(surname, name, lastname, birthDate)
         return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.CREATED)
     }
