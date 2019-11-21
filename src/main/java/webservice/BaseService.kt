@@ -22,7 +22,7 @@ open class BaseService {
 
     protected fun validateHeaders(contentType: String) {
 
-        if (contentType != "application/json") throw Exception400.NoContentType()
+        if (!contentType.contains("application/json")) throw Exception400.NoContentType()
     }
 
     protected fun validJsonParse(body: String, key: String): Any {
