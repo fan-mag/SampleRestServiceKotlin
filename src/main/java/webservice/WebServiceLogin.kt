@@ -1,6 +1,5 @@
 package webservice
 
-import com.jayway.jsonpath.JsonPath
 import model.ApiKey
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -14,8 +13,8 @@ open class WebServiceLogin : BaseService() {
                   @RequestHeader(value = "Content-Type") contentType: String): ResponseEntity<Any> {
         incrementCount()
         validateHeaders(contentType)
-        val login: String? = jsonParse(body, "$['login']") as String?
-        val password: String? = jsonParse(body, "$['password']") as String?
+        val login: String = validJsonParse(body, "$['login']") as String
+        val password: String = validJsonParse(body, "$['password']") as String
         return ResponseEntity(ApiKey(dbCredentials.getApiKey(login, password)), HttpStatus.OK)
     }
 
@@ -24,8 +23,8 @@ open class WebServiceLogin : BaseService() {
                    @RequestHeader(value = "Content-Type") contentType: String): ResponseEntity<Any> {
         incrementCount()
         validateHeaders(contentType)
-        val login: String? = jsonParse(body, "$['login']") as String?
-        val password: String? = jsonParse(body, "$['password']") as String?
-        return ResponseEntity(ApiKey(dbCredentials.generateApiKey(login, password)), HttpStatus.OK)
+        val login: String = validJsonParse(body, "$['login']") as String
+        val password: String = validJsonParse(body, "$['password']") as String
+        return ResponseEntity(ApiKey(dbCredentials.generateApiKey(login, password)), HttpStatus.ACCEPTED)
     }
 }

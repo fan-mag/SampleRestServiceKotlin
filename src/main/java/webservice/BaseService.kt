@@ -1,5 +1,6 @@
 package webservice
 
+import com.jayway.jsonpath.InvalidJsonException
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.PathNotFoundException
 import helpers.CredentialsHelper
@@ -10,6 +11,7 @@ import responses.Exception400
 import responses.Exception401
 import responses.Exception403
 import responses.Exception404
+import java.text.ParseException
 
 
 open class BaseService {
@@ -25,16 +27,25 @@ open class BaseService {
     protected fun validJsonParse(body: String, key: String): Any {
         try {
             return JsonPath.parse(body).read(key)
-        } catch (exception: PathNotFoundException) {
-            throw Exception400()
+
+        } catch (exception: Exception) {
+            when (exception) {
+                is PathNotFoundException -> throw Exception400.NoData()
+                is InvalidJsonException, is ParseException -> throw Exception400.IncorrectJson()
+                else -> throw exception
+            }
         }
     }
 
     protected fun jsonParse(body: String, key: String): Any? {
         try {
             return JsonPath.parse(body).read(key)
-        } catch (exception: PathNotFoundException) {
-            return null
+        } catch (exception: Exception) {
+            when (exception) {
+                is PathNotFoundException -> return null
+                is InvalidJsonException, is ParseException -> throw Exception400.IncorrectJson()
+                else -> throw exception
+            }
         }
     }
 
@@ -44,7 +55,7 @@ open class BaseService {
                 return any.toLong()
             return any as Long
         } catch (exception: ClassCastException) {
-            throw Exception400()
+            throw Exception400.ClassCast()
         }
     }
 
@@ -54,11 +65,11 @@ open class BaseService {
     }
 
     protected fun validateApiKey(apiKey: String?, privilegeLevel: Int) {
-        if (apiKey == null) throw Exception401()
-        if (apiKey == "") throw Exception400()
+        if (apiKey == null) throw Exception401.NoApiKey()
+        if (apiKey == "") throw Exception401.EmptyApiKey()
         val code: Int = dbCredentials.validateApiKey(apiKey, privilegeLevel)
-        if (code == 401) throw Exception401()
-        if (code == 403) throw Exception403()
+        if (code == 401) throw Exception401.InvalidApiKey()
+        if (code == 403) throw Exception403.NoPermissions()
     }
 
     protected fun incrementCount() {
