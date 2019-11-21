@@ -1,6 +1,5 @@
 package webservice
 
-import com.jayway.jsonpath.JsonPath
 import model.Person
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -25,7 +24,7 @@ class WebServicePerson : BaseService() {
     }
 
     @DeleteMapping("/person")
-    fun personDelete(@RequestHeader(value = "Api-Key", defaultValue = "") apiKey: String,
+    fun personDelete(@RequestHeader(value = "Api-Key", required = false) apiKey: String?,
                      @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String,
                      @RequestBody(required = true) body: String): ResponseEntity<Any> {
         incrementCount()

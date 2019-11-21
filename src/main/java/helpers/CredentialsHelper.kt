@@ -1,7 +1,6 @@
 package helpers
 
 import errors.Exception401
-import errors.Exception403
 
 
 class CredentialsHelper : DatabaseHelper() {
@@ -14,12 +13,13 @@ class CredentialsHelper : DatabaseHelper() {
         } else throw Exception401()
     }
 
-    fun validateApiKey(apiKey: String, privilegeLevel: Int) {
+    fun validateApiKey(apiKey: String?, privilegeLevel: Int) : Int {
         val query = "SELECT privilege FROM credentials WHERE api_key = '$apiKey'"
         val rs = conn.createStatement().executeQuery(query)
         if (rs.next()) {
-            if (rs.getInt("privilege") < privilegeLevel) throw Exception403()
-        } else throw Exception401()
+            if (rs.getInt("privilege") < privilegeLevel) return 403
+        } else return 401
+        return 0
     }
 
     fun generateApiKey(login: String?, password: String?): String {
