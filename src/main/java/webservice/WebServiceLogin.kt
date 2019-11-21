@@ -13,8 +13,8 @@ open class WebServiceLogin : BaseService() {
                   @RequestHeader(value = "Content-Type") contentType: String): ResponseEntity<Any> {
         incrementCount()
         validateHeaders(contentType)
-        val login: String = validJsonParseString(body, "$['login']")
-        val password: String = validJsonParseString(body, "$['password']")
+        val login: String = parseValidStringFromJson(body, "$['login']")
+        val password: String = parseValidStringFromJson(body, "$['password']")
         return ResponseEntity(ApiKey(dbCredentials.getApiKey(login, password)), HttpStatus.OK)
     }
 
@@ -23,8 +23,8 @@ open class WebServiceLogin : BaseService() {
                    @RequestHeader(value = "Content-Type", defaultValue = "") contentType: String): ResponseEntity<Any> {
         incrementCount()
         validateHeaders(contentType)
-        val login: String = validJsonParseString(body, "$['login']") as String
-        val password: String = validJsonParseString(body, "$['password']") as String
+        val login: String = parseValidStringFromJson(body, "$['login']")
+        val password: String = parseValidStringFromJson(body, "$['password']")
         return ResponseEntity(ApiKey(dbCredentials.generateApiKey(login, password)), HttpStatus.ACCEPTED)
     }
 }

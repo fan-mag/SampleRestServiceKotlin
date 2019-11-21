@@ -49,7 +49,7 @@ open class BaseService {
         }
     }
 
-    protected fun validJsonParseString(body: String, key: String): String {
+    protected fun parseValidStringFromJson(body: String, key: String): String {
         try {
             return validJsonParse(body, key).toString()
         } catch (exception: ClassCastException) {
@@ -58,7 +58,7 @@ open class BaseService {
     }
 
 
-    protected fun validJsonParseLong(body: String, key: String): Long {
+    protected fun parseValidLongFromJson(body: String, key: String): Long {
         try {
             val any: Any = validJsonParse(body, key)
             if (any is Int)
