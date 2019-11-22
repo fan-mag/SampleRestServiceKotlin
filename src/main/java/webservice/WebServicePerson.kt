@@ -15,7 +15,7 @@ class WebServicePerson : BaseService() {
                   @RequestParam(value = "name", defaultValue = "") name: String,
                   @RequestParam(value = "lastname", defaultValue = "") lastname: String,
                   @RequestParam(value = "id", defaultValue = "0") id: Long,
-                  @RequestHeader(value = "Api-Key", required = false) apiKey: String): ResponseEntity<Any> {
+                  @RequestHeader(value = "Api-Key", required = false) apiKey: String?): ResponseEntity<Any> {
         incrementCount()
         validateApiKey(apiKey, 5)
         val persons: ArrayList<Person> = if (id != 0L) dbPerson.getPerson(id)
