@@ -14,4 +14,7 @@ class Exception401 : RuntimeException() {
 
     @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Invalid API key header provided")
     class InvalidApiKey : RuntimeException()
+
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED, reason = "Incorrect type API key header provided")
+    class IncorrectTypeApiKey : RuntimeException()
 }

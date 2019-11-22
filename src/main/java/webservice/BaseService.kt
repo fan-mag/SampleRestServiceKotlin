@@ -76,6 +76,7 @@ open class BaseService {
 
     protected fun validateApiKey(apiKey: String?, privilegeLevel: Int) {
         if (apiKey == null) throw Exception401.NoApiKey()
+        if (!apiKey.matches(Regex("^\\d+$"))) throw Exception401.IncorrectTypeApiKey()
         if (apiKey == "") throw Exception401.EmptyApiKey()
         val code: Int = dbCredentials.validateApiKey(apiKey, privilegeLevel)
         if (code == 401) throw Exception401.InvalidApiKey()
