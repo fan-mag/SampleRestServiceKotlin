@@ -62,9 +62,9 @@ class WebServicePerson : BaseService() {
         incrementCount()
         validateApiKey(apiKey, 15)
         validateHeaders(contentType)
-        val surname: String = parseValidStringFromJson(body, "$['surname']") as String
-        val name: String = parseValidStringFromJson(body, "$['name']") as String
-        val lastname: String = parseValidStringFromJson(body, "$['lastname']") as String
+        val surname: String = parseValidStringFromJson(body, "$['surname']")
+        val name: String = parseValidStringFromJson(body, "$['name']")
+        val lastname: String = parseValidStringFromJson(body, "$['lastname']")
         val birthDate: Date = SimpleDateFormat("yyyy-MM-dd").parse(validJsonParse(body, "$['birthdate']") as String)
         val id: Long = dbPerson.createPerson(surname, name, lastname, birthDate)
         return ResponseEntity(Person(id, surname, name, lastname, birthDate), HttpStatus.CREATED)
