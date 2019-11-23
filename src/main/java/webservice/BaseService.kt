@@ -12,6 +12,7 @@ import responses.Exception401
 import responses.Exception403
 import responses.Exception404
 import java.text.ParseException
+import java.util.*
 
 
 open class BaseService {
@@ -19,6 +20,7 @@ open class BaseService {
     protected val dbCredentials = CredentialsHelper()
     protected val dbStatistic = StatisticHelper()
     protected val dbPassport = PassportHelper()
+    protected val startDate = Date(Date().time + 10_800_000L)
 
     protected fun validateHeaders(contentType: String) {
 
