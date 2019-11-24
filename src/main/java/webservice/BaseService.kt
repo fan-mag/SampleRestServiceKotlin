@@ -126,6 +126,8 @@ open class BaseService {
             try {
                 val split = passport.split("-")
                 if (split.size != 2) throw Exception400.InvalidPassportType()
+                if (split[0].length != 4) throw Exception400.InvalidPassportType()
+                if (split[1].length != 6) throw Exception400.InvalidPassportType()
                 Integer.parseInt(split[0])
                 Integer.parseInt(split[1])
             } catch (exception: Exception) {

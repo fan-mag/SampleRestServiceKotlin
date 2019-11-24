@@ -47,6 +47,7 @@ class WebServicePerson : BaseService() {
         val name = parseStringFromJson(requestBody, "$['name']")
         val lastname = parseStringFromJson(requestBody, "$['lastname']")
         val passport = parseStringFromJson(requestBody, "$['passport']")
+        validatePassport(passport)
         val persons: List<Person>
         var inputCase = 0
         if (surname != null || name != null || lastname != null) inputCase += 1
