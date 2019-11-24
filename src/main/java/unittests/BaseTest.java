@@ -1,4 +1,0 @@
-package unittests;
-
-class BaseTest {
-}

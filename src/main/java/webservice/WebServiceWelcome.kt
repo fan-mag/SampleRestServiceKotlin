@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.TimeZone
 import java.text.SimpleDateFormat
 
-
-
 @RestController
 class WebServiceWelcome : BaseService() {
     @GetMapping("/")
