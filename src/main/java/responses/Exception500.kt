@@ -17,4 +17,9 @@ open class Exception500 : RuntimeException() {
 
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "PersonHelper.getQueryBuilder case no impl")
     class PersonDatabaseNoImpl : Exception500()
+
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Person.DELETE case no impl")
+    class PersonDeleteNoImpl : Exception500() {
+
+    }
 }

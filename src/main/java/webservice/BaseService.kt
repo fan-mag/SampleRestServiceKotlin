@@ -51,6 +51,35 @@ open class BaseService {
         }
     }
 
+    protected fun parseStringFromJson(body: String, key: String): String? {
+        try {
+            val any: Any? = jsonParse(body, key) ?: return null
+            return any.toString()
+        } catch (exception: ClassCastException) {
+            throw Exception400.ClassCast()
+        }
+    }
+
+    protected fun parseIntFromJson(body: String, key: String): Int? {
+        try {
+            val any: Any? = jsonParse(body, key) ?: return null
+            return any.toString().toInt()
+        } catch (exception: ClassCastException) {
+            throw Exception400.ClassCast()
+        }
+    }
+
+    protected fun parseLongFromJson(body: String, key: String): Long? {
+        try {
+            val any: Any? = jsonParse(body, key) ?: return null
+            if (any is Int)
+                return any.toLong()
+            return any as Long
+        } catch (exception: ClassCastException) {
+            throw Exception400.ClassCast()
+        }
+    }
+
     protected fun parseValidStringFromJson(body: String, key: String): String {
         try {
             return validJsonParse(body, key).toString()
@@ -87,7 +116,7 @@ open class BaseService {
     protected fun validateParamAsInt(input: String?): Int? {
         try {
             return input?.toInt()
-        } catch (exception : NumberFormatException) {
+        } catch (exception: NumberFormatException) {
             throw Exception400.ClassCast()
         }
     }

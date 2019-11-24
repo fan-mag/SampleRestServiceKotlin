@@ -25,8 +25,8 @@ class PersonHelper : DatabaseHelper() {
     fun getPersons(passport: String?): List<Person> {
         val query: String = getQueryBuilder(2)
         val seria = passport?.split("-")?.get(0)?.toInt()
-        val passport = passport?.split("-")?.get(1)?.toInt()
-        val statement = prepareStatement(query, seria, passport)
+        val number = passport?.split("-")?.get(1)?.toInt()
+        val statement = prepareStatement(query, seria, number)
         val rs = statement.executeQuery()
         return readPersonsFromResultSet(rs)
     }
@@ -40,6 +40,22 @@ class PersonHelper : DatabaseHelper() {
         val statement = prepareStatement(query, surname, name, lastname)
         val rs = statement.executeQuery()
         return readPersonsFromResultSet(rs)
+    }
+
+    fun deletePerson(person: Person) {
+        if (person.passport != null)
+            deletePassport(person.passport)
+        val query = "DELETE FROM person WHERE id = ?"
+        val statement = prepareStatement(query, person.person_id)
+        statement.execute()
+    }
+
+    private fun deletePassport(passport: String) {
+        val seria = passport.split("-")[0]
+        val number = passport.split("-")[1]
+        val query = "DELETE FROM passport WHERE Серия = ? AND Номер = ?"
+        val statement = prepareStatement(query, seria.toInt(), number.toInt())
+        statement.execute()
     }
 
     private fun getQueryBuilder(caseQuery: Int): String {
@@ -70,7 +86,7 @@ class PersonHelper : DatabaseHelper() {
     private fun readPersonsFromResultSet(rs: ResultSet): List<Person> {
         val persons = ArrayList<Person>()
         while (rs.next()) {
-            val passport : String? =
+            val passport: String? =
                     if (rs.getString("Серия") == null || rs.getString("Номер") == null) null
                     else rs.getString("Серия") + "-" + rs.getString("Номер")
             val person = Person(
@@ -85,6 +101,7 @@ class PersonHelper : DatabaseHelper() {
         }
         return persons
     }
+
 }
 
 
