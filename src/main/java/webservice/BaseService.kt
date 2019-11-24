@@ -81,7 +81,7 @@ open class BaseService {
     }
 
     protected fun incrementCount() {
-        dbStatistic.incrementCount()
+        dbStatistic.incrementCount("TotalRequests")
     }
 
     protected fun validateParamAsInt(input: String?): Int? {

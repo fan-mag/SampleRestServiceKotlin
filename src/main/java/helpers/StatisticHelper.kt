@@ -8,8 +8,8 @@ class StatisticHelper : DatabaseHelper() {
         return rs.getLong("hitcount")
     }
 
-    fun incrementCount() {
-        val query = "UPDATE rest_stat SET hitcount = hitcount + 1"
+    fun incrementCount(rowName: String) {
+        val query = "UPDATE rest_stat SET hitcount = hitcount + 1 WHERE Name = '$rowName'"
         conn.createStatement().execute(query)
     }
 }

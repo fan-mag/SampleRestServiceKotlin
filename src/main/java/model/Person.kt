@@ -1,6 +1,4 @@
 package model
 
-import java.util.*
-
-class Person(person_id: Int, surname: String, name: String, lastname: String, birthdate: String, passport: String) {
+class Person(var person_id: Int, val surname: String, val name: String, val lastname: String, val birthdate: String, val passport: String?) {
 }

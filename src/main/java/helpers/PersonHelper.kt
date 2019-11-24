@@ -70,16 +70,18 @@ class PersonHelper : DatabaseHelper() {
     private fun readPersonsFromResultSet(rs: ResultSet): List<Person> {
         val persons = ArrayList<Person>()
         while (rs.next()) {
-            persons.add(
-                    Person(
-                            rs.getInt("id"),
-                            rs.getString("Фамилия"),
-                            rs.getString("Имя"),
-                            rs.getString("Отчество"),
-                            SimpleDateFormat("dd.MM.yyyy").format(rs.getDate("Дата_рождения")),
-                            rs.getString("Серия") + "-" + rs.getString("Номер")
-                    )
+            val passport : String? =
+                    if (rs.getString("Серия") == null || rs.getString("Номер") == null) null
+                    else rs.getString("Серия") + "-" + rs.getString("Номер")
+            val person = Person(
+                    rs.getInt("id"),
+                    rs.getString("Фамилия"),
+                    rs.getString("Имя"),
+                    rs.getString("Отчество"),
+                    SimpleDateFormat("dd.MM.yyyy").format(rs.getDate("Дата_рождения")),
+                    passport
             )
+            persons.add(person)
         }
         return persons
     }

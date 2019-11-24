@@ -1,14 +1,20 @@
 package responses
 
+import helpers.StatisticHelper
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 
 @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Unknown Server Error")
-class Exception500 : RuntimeException() {
+open class Exception500 : RuntimeException() {
+
+    init {
+        val db = StatisticHelper()
+        db.incrementCount("Exception500")
+    }
 
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Person.GET case no impl")
-    class PersonGetNoImpl : RuntimeException()
+    class PersonGetNoImpl : Exception500()
 
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR, reason = "PersonHelper.getQueryBuilder case no impl")
-    class PersonDatabaseNoImpl : RuntimeException()
+    class PersonDatabaseNoImpl : Exception500()
 }
