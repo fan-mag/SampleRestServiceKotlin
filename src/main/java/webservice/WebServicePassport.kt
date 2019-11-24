@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class WebServicePassport : BaseService() {
 
+    /*
     @GetMapping("/passport")
     fun passportGet(@RequestParam(defaultValue = "0") user_id: Int,
                     @RequestParam(defaultValue = "0") seria: Int,
@@ -32,5 +33,5 @@ class WebServicePassport : BaseService() {
         val status: HttpStatus = if (isPassportDeleted) HttpStatus.NO_CONTENT else HttpStatus.UNPROCESSABLE_ENTITY
         return ResponseEntity(isPassportDeleted, status)
     }
-
+*/
 }

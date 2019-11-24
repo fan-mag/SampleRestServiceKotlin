@@ -18,5 +18,6 @@ class Exception400 : RuntimeException() {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Incorrect Content-Type Header")
     class NoContentType : RuntimeException()
 
-
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Passport format must be in 0000-000000 format")
+    class InvalidPassportType : RuntimeException()
 }

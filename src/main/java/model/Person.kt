@@ -2,6 +2,5 @@ package model
 
 import java.util.*
 
-class Person(var id: Long?, var surname: String?, var name: String?, var lastname: String?, var birthDate: Date) {
-
+class Person(person_id: Int, surname: String, name: String, lastname: String, birthdate: String, passport: String) {
 }

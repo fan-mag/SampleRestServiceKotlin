@@ -71,11 +71,6 @@ open class BaseService {
         }
     }
 
-    fun validatePersonInDatabase(id: Long): Boolean {
-        if (!dbPerson.getPerson(id).isEmpty()) return true
-        else throw Exception404.NoPerson()
-    }
-
     protected fun validateApiKey(apiKey: String?, privilegeLevel: Int) {
         if (apiKey == null) throw Exception401.NoApiKey()
         if (apiKey == "") throw Exception401.EmptyApiKey()
@@ -87,6 +82,31 @@ open class BaseService {
 
     protected fun incrementCount() {
         dbStatistic.incrementCount()
+    }
+
+    protected fun validateParamAsInt(input: String?): Int? {
+        try {
+            return input?.toInt()
+        } catch (exception : NumberFormatException) {
+            throw Exception400.ClassCast()
+        }
+    }
+
+    protected fun validatePassport(passport: String?) {
+        if (passport != null) {
+            try {
+                val split = passport.split("-")
+                if (split.size != 2) throw Exception400.InvalidPassportType()
+                Integer.parseInt(split[0])
+                Integer.parseInt(split[1])
+            } catch (exception: Exception) {
+                when (exception) {
+                    is IndexOutOfBoundsException -> throw Exception400.InvalidPassportType()
+                    is NumberFormatException -> throw Exception400.InvalidPassportType()
+                    else -> throw exception
+                }
+            }
+        }
     }
 
 

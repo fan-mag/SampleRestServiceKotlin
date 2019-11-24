@@ -1,56 +1,88 @@
 package helpers
 
 import model.Person
+import responses.Exception500
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.text.SimpleDateFormat
-import java.util.*
 
 class PersonHelper : DatabaseHelper() {
-    fun getPerson(id: Long): ArrayList<Person> {
-        val query = "SELECT * FROM person WHERE id = $id"
-        val rs = conn.createStatement().executeQuery(query)
-        val array = ArrayList<Person>()
-        if (rs.next()) {
-            array.add(Person(rs.getLong("id"), rs.getString("Фамилия"),
-                    rs.getString("Имя"), rs.getString("Отчество"),
-                    rs.getDate("Дата_рождения")))
+
+    fun getPersons(): List<Person> {
+        val query: String = getQueryBuilder(0)
+        val statement = prepareStatement(query)
+        val rs = statement.executeQuery()
+        return readPersonsFromResultSet(rs)
+    }
+
+    fun getPersons(personId: Int?): List<Person> {
+        val query: String = getQueryBuilder(1)
+        val statement = prepareStatement(query, personId)
+        val rs = statement.executeQuery()
+        return readPersonsFromResultSet(rs)
+    }
+
+    fun getPersons(passport: String?): List<Person> {
+        val query: String = getQueryBuilder(2)
+        val seria = passport?.split("-")?.get(0)?.toInt()
+        val passport = passport?.split("-")?.get(1)?.toInt()
+        val statement = prepareStatement(query, seria, passport)
+        val rs = statement.executeQuery()
+        return readPersonsFromResultSet(rs)
+    }
+
+    fun getPersons(surname: String?, name: String?, lastname: String?): List<Person> {
+        var caseQuery = 3
+        if (lastname != null) caseQuery += 1
+        if (name != null) caseQuery += 2
+        if (surname != null) caseQuery += 4
+        val query: String = getQueryBuilder(caseQuery)
+        val statement = prepareStatement(query, surname, name, lastname)
+        val rs = statement.executeQuery()
+        return readPersonsFromResultSet(rs)
+    }
+
+    private fun getQueryBuilder(caseQuery: Int): String {
+        val baseQuery = "SELECT person.id, Фамилия, Имя, Отчество, Дата_рождения, Серия, Номер " +
+                "FROM person LEFT JOIN passport ON person.id = passport.person_id "
+        return when (caseQuery) {
+            0 -> baseQuery
+            1 -> baseQuery + "WHERE person_id = ?"
+            2 -> baseQuery + "WHERE Серия = ? AND Номер = ?"
+            4 -> baseQuery + "WHERE Отчество = ?"
+            5 -> baseQuery + "WHERE Имя = ?"
+            6 -> baseQuery + "WHERE Имя = ? AND Отчество = ?"
+            7 -> baseQuery + "WHERE Фамилия = ?"
+            8 -> baseQuery + "WHERE Фамилия = ? AND Отчество = ?"
+            9 -> baseQuery + "WHERE Фамилия = ? AND Имя = ?"
+            10 -> baseQuery + "WHERE Фамилия = ? AND Имя = ? AND Отчество = ?"
+            else -> throw Exception500.PersonDatabaseNoImpl()
         }
-        return array
     }
 
-    fun createPerson(surname: String?, name: String?, lastname: String?, birthDate: Date): Long {
-        val birth: String = SimpleDateFormat("yyyy-MM-dd").format(birthDate)
-        val query: String = "INSERT INTO person " +
-                "(id, Фамилия, Имя, Отчество, Дата_рождения) " +
-                "VALUES (DEFAULT, '$surname', '$name', '$lastname', '$birth') RETURNING id AS ID"
-        val rs = conn.createStatement().executeQuery(query)
-        rs.next()
-        return rs.getLong("ID")
+    private fun prepareStatement(query: String, vararg fields: Any?): PreparedStatement {
+        val statement = conn.prepareStatement(query)
+        var currentField = 1
+        fields.forEach { field -> if (field != null) statement.setObject(currentField++, field) }
+        return statement
     }
 
-    fun updatePerson(id: Long?, surname: String?, name: String?, lastname: String?, birthDate: Date) {
-        val birth: String = SimpleDateFormat("yyyy-MM-dd").format(birthDate)
-        val query: String = "UPDATE person " +
-                "SET Фамилия = '$surname', Имя = '$name', Отчество = '$lastname', Дата_рождения = '$birth' " +
-                "WHERE id = $id"
-        conn.createStatement().execute(query)
-    }
-
-    fun deletePerson(id: Long?) {
-        val queryDelete = "DELETE FROM person WHERE id = $id"
-        conn.createStatement().execute(queryDelete)
-    }
-
-
-    fun getPerson(surname: String, name: String, lastname: String): ArrayList<Person> {
-        val query: String = "SELECT * FROM person WHERE Фамилия LIKE '%$surname' AND Имя LIKE '%$name' AND Отчество LIKE '%$lastname'" +
-                ""
-        val rs = conn.createStatement().executeQuery(query)
-        val array = ArrayList<Person>()
+    private fun readPersonsFromResultSet(rs: ResultSet): List<Person> {
+        val persons = ArrayList<Person>()
         while (rs.next()) {
-            array.add(Person(rs.getLong("id"), rs.getString("Фамилия"),
-                    rs.getString("Имя"), rs.getString("Отчество"),
-                    rs.getDate("Дата_рождения")))
+            persons.add(
+                    Person(
+                            rs.getInt("id"),
+                            rs.getString("Фамилия"),
+                            rs.getString("Имя"),
+                            rs.getString("Отчество"),
+                            SimpleDateFormat("dd.MM.yyyy").format(rs.getDate("Дата_рождения")),
+                            rs.getString("Серия") + "-" + rs.getString("Номер")
+                    )
+            )
         }
-        return array
+        return persons
     }
 }
+
+
