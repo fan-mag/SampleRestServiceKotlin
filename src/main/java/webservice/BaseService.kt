@@ -12,8 +12,12 @@ import helpers.StatisticHelper
 import responses.Exception400
 import responses.Exception401
 import responses.Exception403
-import responses.Exception404
 import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.time.DateTimeException
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.ResolverStyle
 import java.util.*
 
 
@@ -157,5 +161,23 @@ open class BaseService {
         }
     }
 
+    protected fun validateBirthdate(birthdate: String) {
+        try {
+            SimpleDateFormat("dd.MM.yyyy").parse(birthdate)
+            val dtf = DateTimeFormatter.ofPattern("dd.MM.uuuu").withResolverStyle(ResolverStyle.STRICT)
+            LocalDate.parse(birthdate, dtf)
+        } catch (exception: Exception) {
+            when (exception) {
+                is ParseException, is DateTimeException -> throw Exception400.IncorrectDateFormat()
+                else -> throw exception
+            }
+        }
+    }
 
+    protected fun validateStrings(vararg strings: String) {
+        strings.forEach { string ->
+            if (!string.matches(Regex("^[-_a-zA-Zа-яА-я]+$")))
+                throw Exception400.IncorrectSNLFormat()
+        }
+    }
 }

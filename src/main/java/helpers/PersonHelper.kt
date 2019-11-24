@@ -2,9 +2,11 @@ package helpers
 
 import model.Person
 import responses.Exception500
-import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.ResolverStyle
 
 class PersonHelper : DatabaseHelper() {
 
@@ -58,6 +60,17 @@ class PersonHelper : DatabaseHelper() {
         statement.execute()
     }
 
+    fun addPerson(person: Person) {
+        val dtf = DateTimeFormatter.ofPattern("dd.MM.uuuu").withResolverStyle(ResolverStyle.STRICT)
+        val birthdate = LocalDate.parse(person.birthdate, dtf)
+        val query = "INSERT INTO person (id, Фамилия, Имя, Отчество, Дата_рождения) " +
+                "VALUES (DEFAULT, ?, ?, ?, ?) RETURNING id"
+        val statement = prepareStatement(query, person.surname, person.name, person.lastname, birthdate)
+        val rs = statement.executeQuery()
+        rs.next()
+        person.person_id = rs.getInt("id")
+    }
+
     private fun getQueryBuilder(caseQuery: Int): String {
         val baseQuery = "SELECT person.id, Фамилия, Имя, Отчество, Дата_рождения, Серия, Номер " +
                 "FROM person LEFT JOIN passport ON person.id = passport.person_id "
@@ -74,13 +87,6 @@ class PersonHelper : DatabaseHelper() {
             10 -> baseQuery + "WHERE Фамилия = ? AND Имя = ? AND Отчество = ?"
             else -> throw Exception500.PersonDatabaseNoImpl()
         }
-    }
-
-    private fun prepareStatement(query: String, vararg fields: Any?): PreparedStatement {
-        val statement = conn.prepareStatement(query)
-        var currentField = 1
-        fields.forEach { field -> if (field != null) statement.setObject(currentField++, field) }
-        return statement
     }
 
     private fun readPersonsFromResultSet(rs: ResultSet): List<Person> {
@@ -101,6 +107,7 @@ class PersonHelper : DatabaseHelper() {
         }
         return persons
     }
+
 
 }
 

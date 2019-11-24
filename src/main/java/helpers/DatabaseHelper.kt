@@ -2,6 +2,7 @@ package helpers
 
 import java.sql.Connection
 import java.sql.DriverManager
+import java.sql.PreparedStatement
 import java.util.*
 
 open class DatabaseHelper {
@@ -15,6 +16,13 @@ open class DatabaseHelper {
         props.setProperty("password", "study")
         conn = DriverManager.getConnection(url, props)
 
+    }
+
+    protected fun prepareStatement(query: String, vararg fields: Any?): PreparedStatement {
+        val statement = conn.prepareStatement(query)
+        var currentField = 1
+        fields.forEach { field -> if (field != null) statement.setObject(currentField++, field) }
+        return statement
     }
 
 }

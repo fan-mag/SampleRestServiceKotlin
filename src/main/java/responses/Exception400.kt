@@ -1,8 +1,8 @@
 package responses
 
+import helpers.StatisticHelper
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
-import helpers.StatisticHelper
 
 @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Bad Request")
 open class Exception400 : RuntimeException() {
@@ -26,5 +26,11 @@ open class Exception400 : RuntimeException() {
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Passport format must be in 0000-000000 format")
     class InvalidPassportType : Exception400()
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Incorrect date format. Must be in 31.12.2018 format")
+    class IncorrectDateFormat : Exception400()
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Incorrect Surname/Name/Lastname format.")
+    class IncorrectSNLFormat : Exception400()
 
 }
