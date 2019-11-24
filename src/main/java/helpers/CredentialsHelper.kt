@@ -41,7 +41,7 @@ class CredentialsHelper : DatabaseHelper() {
             val statement: PreparedStatement = conn.prepareStatement(queryKey)
             statement.setLong(1, newRandomKey)
             statement.setString(2, login)
-            println(statement.executeUpdate())
+            statement.executeUpdate()
             return newRandomKey.toString()
         }
     }

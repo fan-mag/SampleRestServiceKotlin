@@ -1,5 +1,7 @@
 package webservice
 
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.jayway.jsonpath.InvalidJsonException
 import com.jayway.jsonpath.JsonPath
 import com.jayway.jsonpath.PathNotFoundException
@@ -25,6 +27,18 @@ open class BaseService {
     protected fun validateHeaders(contentType: String) {
 
         if (!contentType.contains("application/json")) throw Exception400.NoContentType()
+    }
+
+    protected fun validateJson(json: String) {
+        try {
+            if (Gson().fromJson(json, Object::class.java).`class` == String::class.java)
+                throw Exception400.IncorrectJson()
+        } catch (exception: Exception) {
+            when (exception) {
+                is JsonSyntaxException -> throw Exception400.IncorrectJson()
+                else -> throw exception
+            }
+        }
     }
 
     protected fun validJsonParse(body: String, key: String): Any {
@@ -64,8 +78,11 @@ open class BaseService {
         try {
             val any: Any? = jsonParse(body, key) ?: return null
             return any.toString().toInt()
-        } catch (exception: ClassCastException) {
-            throw Exception400.ClassCast()
+        } catch (exception: Exception) {
+            when (exception) {
+                is NumberFormatException, is ClassCastException -> throw Exception400.ClassCast()
+                else -> throw exception
+            }
         }
     }
 

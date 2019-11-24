@@ -42,6 +42,8 @@ class WebServicePerson : BaseService() {
                       @RequestBody(required = false) requestBody: String): ResponseEntity<Any> {
         incrementCount()
         validateApiKey(apiKey, 15)
+        validateHeaders(contentType)
+        validateJson(requestBody)
         val personId = parseIntFromJson(requestBody, "$['id']")
         val surname = parseStringFromJson(requestBody, "$['surname']")
         val name = parseStringFromJson(requestBody, "$['name']")
