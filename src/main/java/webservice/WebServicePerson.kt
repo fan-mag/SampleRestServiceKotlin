@@ -142,6 +142,32 @@ class WebServicePerson : BaseService() {
         return ResponseEntity(PersonResponse("Successfull updated user in the system", ArrayList(listOf(person))), HttpStatus.OK)
     }
 
+    @PatchMapping("/person")
+    fun patchPerson(@RequestHeader(name = "Api-Key", required = false) apiKey: String?,
+                    @RequestHeader(name = "Content-Type", defaultValue = "") contentType: String,
+                    @RequestBody(required = false) requestBody: String): ResponseEntity<Any> {
+        incrementCount()
+        validateApiKey(apiKey, 15)
+        validateHeaders(contentType)
+        validateJson(requestBody)
+        val personId = parseValidIntFromJson(requestBody, "$['id']")
+        val surname = parseValidStringFromJson(requestBody, "$['surname']")
+        val name = parseValidStringFromJson(requestBody, "$['name']")
+        val lastname = parseValidStringFromJson(requestBody, "$['lastname']")
+        validateStrings(surname, name, lastname)
+        val birthdate = parseValidStringFromJson(requestBody, "$['birthdate']")
+        validateBirthdate(birthdate)
+        val passport = parseStringFromJson(requestBody, "$['passport']")
+        if (passport != null)
+            return ResponseEntity(PersonResponse("Passport can't be processed in PATCH request, use PUT instead", ArrayList()), HttpStatus.UNPROCESSABLE_ENTITY)
+        val persons = dbPerson.getPersons(personId)
+        if (persons.isEmpty())
+            return ResponseEntity(PersonResponse("User with ID $personId not found", ArrayList()), HttpStatus.NOT_FOUND)
+        val person = Person(personId, surname, name, lastname, birthdate, persons[0].passport)
+        dbPerson.updatePerson(person)
+        return ResponseEntity(PersonResponse("Successfull updated user in the system", ArrayList(listOf(person))), HttpStatus.OK)
+    }
+
     private fun checkPassportValidity(personId: Int, passport: String): Int {
         val passports = dbPassport.getPassports(passport)
         if (passports.isEmpty()) return 1
