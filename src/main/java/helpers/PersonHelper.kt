@@ -71,6 +71,14 @@ class PersonHelper : DatabaseHelper() {
         person.person_id = rs.getInt("id")
     }
 
+    fun updatePerson(person: Person) {
+        val dtf = DateTimeFormatter.ofPattern("dd.MM.uuuu").withResolverStyle(ResolverStyle.STRICT)
+        val birthdate = LocalDate.parse(person.birthdate, dtf)
+        val query = "UPDATE person SET Фамилия = ?, Имя = ?, Отчество = ?, Дата_рождения = ? WHERE id = ?"
+        val statement = prepareStatement(query, person.surname, person.name, person.lastname, birthdate, person.person_id)
+        statement.execute()
+    }
+
     private fun getQueryBuilder(caseQuery: Int): String {
         val baseQuery = "SELECT person.id, Фамилия, Имя, Отчество, Дата_рождения, Серия, Номер " +
                 "FROM person LEFT JOIN passport ON person.id = passport.person_id "

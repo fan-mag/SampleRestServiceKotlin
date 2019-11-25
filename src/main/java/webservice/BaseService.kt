@@ -109,6 +109,14 @@ open class BaseService {
         }
     }
 
+    protected fun parseValidIntFromJson(body: String, key: String): Int {
+        try {
+            val any: Any = validJsonParse(body, key)
+            return any.toString().toInt()
+        } catch (exception: ClassCastException) {
+            throw Exception400.ClassCast()
+        }
+    }
 
     protected fun parseValidLongFromJson(body: String, key: String): Long {
         try {
