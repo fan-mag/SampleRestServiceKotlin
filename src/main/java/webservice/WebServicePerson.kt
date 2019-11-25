@@ -145,7 +145,7 @@ class WebServicePerson : BaseService() {
     private fun checkPassportValidity(personId: Int, passport: String): Int {
         val passports = dbPassport.getPassports(passport)
         if (passports.isEmpty()) return 1
-        if (passports[0].person_id == null) return 2
+        if (passports[0].person_id == 0) return 2
         return if (passports[0].person_id == personId) 3
         else 4
     }

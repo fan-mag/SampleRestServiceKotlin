@@ -3,40 +3,22 @@ package helpers
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.PreparedStatement
-import java.util.*
 
-open class DatabaseHelper : Runnable {
-    companion object {
-        @Volatile
-        var keepAlive = false
-    }
-
+open class DatabaseHelper {
 
     var conn: Connection
-    val url = "jdbc:postgresql://fan-mag.ddns.net:58091/passport_table"
-    val props = Properties()
+        get() {
+            if (field.isClosed) {
+                field = DriverManager.getConnection(url)
+            }
+            return field
+        }
+
+    val url = "jdbc:postgresql://fan-mag.ddns.net:58091/passport_table?user=postgres&password=study"
 
     init {
         Class.forName("org.postgresql.Driver")
-        props.setProperty("user", "postgres")
-        props.setProperty("password", "study")
-        props.setProperty("tcpKeepAlive", "true")
-        conn = DriverManager.getConnection(url, props)
-        Thread(this).start()
-    }
-
-    override fun run() {
-        if (!keepAlive) {
-            keepAlive = true
-            while (true) {
-                keepAlive()
-                Thread.sleep(30000)
-            }
-        }
-    }
-
-    private fun keepAlive() {
-        incrementCount("KeepAlive")
+        conn = DriverManager.getConnection(url)
     }
 
     protected fun prepareStatement(query: String, vararg fields: Any?): PreparedStatement {

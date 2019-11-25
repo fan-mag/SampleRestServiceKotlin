@@ -113,8 +113,11 @@ open class BaseService {
         try {
             val any: Any = validJsonParse(body, key)
             return any.toString().toInt()
-        } catch (exception: ClassCastException) {
-            throw Exception400.ClassCast()
+        } catch (exception: Exception) {
+            when (exception) {
+                is NumberFormatException, is ClassCastException -> throw Exception400.ClassCast()
+                else -> throw exception
+            }
         }
     }
 
