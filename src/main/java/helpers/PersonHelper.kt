@@ -84,7 +84,7 @@ class PersonHelper : DatabaseHelper() {
                 "FROM person LEFT JOIN passport ON person.id = passport.person_id "
         return when (caseQuery) {
             0 -> baseQuery
-            1 -> baseQuery + "WHERE person_id = ?"
+            1 -> baseQuery + "WHERE person.id = ?"
             2 -> baseQuery + "WHERE Серия = ? AND Номер = ?"
             4 -> baseQuery + "WHERE Отчество = ?"
             5 -> baseQuery + "WHERE Имя = ?"
