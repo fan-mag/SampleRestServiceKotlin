@@ -86,7 +86,7 @@ class WebServicePerson : BaseService() {
         validatePassport(passport)
         if (passport != null) {
             val passports = dbPassport.getPassports(passport)
-            if (!passports.isEmpty())
+            if (passports.isNotEmpty())
                 return ResponseEntity(PersonResponse("This passport is already in base", dbPerson.getPersons(passport)), HttpStatus.UNPROCESSABLE_ENTITY)
         }
         val person = Person(0, surname, name, lastname, birthdate, passport)

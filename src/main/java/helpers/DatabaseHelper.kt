@@ -9,6 +9,7 @@ open class DatabaseHelper {
     var conn: Connection
         get() {
             if (field.isClosed) {
+                println("Connection was closed, setting new connection")
                 field = DriverManager.getConnection(url)
             }
             return field
