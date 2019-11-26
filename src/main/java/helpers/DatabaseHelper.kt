@@ -11,6 +11,7 @@ open class DatabaseHelper {
             if (field.isClosed) {
                 println("Connection was closed, setting new connection")
                 field = DriverManager.getConnection(url)
+                Thread.sleep(3000)
             }
             return field
         }
